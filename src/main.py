@@ -1,6 +1,7 @@
 import sys
 from src.crawler import Crawler
 from src.indexer import Indexer
+from src.search import Searcher
 
 def main():
     print("==================================")
@@ -55,8 +56,10 @@ def main():
                 if not args:
                     print("Error: Please provide a word to print (e.g., 'print nonsense').")
                 else:
-                    # MVP Placeholder: Call your index retrieval logic here
-                    print(f"[Stub] Executing 'print': Fetching index entries for the word '{args}'...")
+                    print(f"Executing 'print': Fetching index entries for the word '{args}'...")
+                    # Instantiate the Searcher with the current data in memory and call the print method.
+                    searcher = Searcher(indexer.inverted_index)
+                    searcher.print_word_index(args)
                     
             elif command == "find":
                 if not args:
