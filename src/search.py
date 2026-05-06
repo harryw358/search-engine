@@ -1,5 +1,6 @@
 import string
 import re
+import math
 
 class Searcher:
     def __init__(self, inverted_index):
@@ -7,6 +8,18 @@ class Searcher:
         Initialises the Searcher with the loaded inverted index.
         """
         self.inverted_index = inverted_index
+        self.total_docs = self._calculate_total_docs()
+
+    def _calculate_total_docs(self):
+        """
+        Helper method to count the total number of unique URLs in the index.
+        """
+        if not self.inverted_index:
+            return 0
+        urls = set()
+        for word_data in self.inverted_index.values():
+            urls.update(word_data.keys())
+        return len(urls)
 
     def print_word_index(self, word):
         """
@@ -37,7 +50,7 @@ class Searcher:
 
     def find_query(self, query):
         """
-        Finds pages containing all words in the search query.
+        Finds pages containing all words in the search query. Ranks by TF-IDF score.
         """
         if not self.inverted_index:
             print("Error: Index is empty. Please run 'load' or 'build' first.")
@@ -74,11 +87,27 @@ class Searcher:
             word_urls = set(self.inverted_index[word].keys())
             matching_urls = matching_urls.intersection(word_urls)
 
-        # Print the results.
+        # Apply TF-IDF Ranking to the matched URLs.
         if matching_urls:
-            print(f"Found {len(matching_urls)} page(s) containing the terms:")
-            for url in sorted(matching_urls): # Sort alphabetically for a cleaner output.
-                print(f"    - {url}")
+            url_scores = {}
+            for url in matching_urls:
+                score = 0
+                for word in words:
+                    tf = self.inverted_index[word][url]['frequency']
+                    df = len(self.inverted_index[word])
+                    # IDF formula: log10(Total Docs / Docs containing search word)
+                    idf = math.log10(self.total_docs / df) if df > 0 else 0
+                    score += tf * idf
+
+                url_scores[url] = score
+
+            # Sort URLs by their computed score in descending order.
+            ranked_urls = sorted(url_scores.items(), key=lambda item: item[1], reverse=True)
+
+            print(f"Found {len(ranked_urls)} page(s) containing the terms:")
+            for url, score in ranked_urls:
+                # Format the score to 4 decimal places.
+                print(f"    - {url} (Score: {score:.4f})")
         else:
             print("No pages found containing all search terms.")
 
