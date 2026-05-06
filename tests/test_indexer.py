@@ -104,3 +104,52 @@ def test_complex_punctuation(indexer):
 
     assert 'helloworld' in index  # depends on your design
     assert 'its' in index
+
+def test_load_index_success(indexer):
+    """
+    Tests that a valid JSON file is loaded successfully into memory.
+    """
+    # 1. Manually write a valid JSON file to temporary test path.
+    valid_data = {"hello": {"http://quotes.toscrape.com/page/1/": {"frequency": 1, "positions": [0]}}}
+
+    os.makedirs(os.path.dirname(indexer.index_file_path), exist_ok=True)
+    with open(indexer.index_file_path, 'w', encoding='utf-8') as f:
+        json.dump(valid_data, f)
+
+    # 2. Call the load method.
+    result = indexer.load_index()
+
+    # 3. It should return True and the data should be in memory.
+    assert result is True
+    assert indexer.inverted_index == valid_data
+
+def test_load_index_missing_file(indexer):
+    """
+    Tests that loading fails gracefully if the index file does not exist.
+    """
+    # 1. Ensure the file path definitely doesn't exist.
+    if os.path.exists(indexer.index_file_path):
+        os.remove(indexer.index_file_path)
+
+    # 2. Call the load method.
+    result = indexer.load_index()
+
+    # 3. It should return False and the index should remain empty.
+    assert result is False
+    assert indexer.inverted_index == {}
+
+def test_load_index_corrupted_json(indexer):
+    """
+    Tests that loading fails gracefully if the file contains corrupt JSON content.
+    """
+    # 1. Write malformed text (not valid JSON) to the target file.
+    os.makedirs(os.path.dirname(indexer.index_file_path), exist_ok=True)
+    with open(indexer.index_file_path, 'w', encoding='utf-8') as f:
+        f.write("{ this is not valid json! 'missing_quotes': 123")
+        
+    # 2. Call the load method
+    result = indexer.load_index()
+    
+    # 3. It should return False because of the JSONDecodeError
+    assert result is False
+    assert indexer.inverted_index == {}

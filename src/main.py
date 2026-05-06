@@ -14,6 +14,9 @@ def main():
     print("  exit/quit    - Close the application")
     print("================================\n")
 
+    # Instantiate the indexer once before the main loop starts so memory persists across different commands.
+    indexer = Indexer()
+
     # The main CLI loop
     while True:
         try:
@@ -40,15 +43,13 @@ def main():
                 if crawled_data:
                     print(f"\nSuccess! Scraped {len(crawled_data)} pages.")
 
-                    # Instantiate the Indexer, build it, and save it.
-                    indexer = Indexer()
                     indexer.build_index(crawled_data)
                     indexer.save_index()
 
                 
             elif command == "load":
-                # MVP Placeholder: Call your file loading logic here later
-                print("[Stub] Executing 'load': Loading index from data/ file...")
+                print("Executing 'load': Loading index from data/ file...")
+                indexer.load_index()
                 
             elif command == "print":
                 if not args:

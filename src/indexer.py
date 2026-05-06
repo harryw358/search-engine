@@ -58,3 +58,23 @@ class Indexer:
             json.dump(self.inverted_index, f, indent=4)
 
         print(f"Index saved successfully to {self.index_file_path}")
+
+    def load_index(self):
+        """
+        Loads the inverted index from the JSON file on the file system.
+        """
+        if not os.path.exists(self.index_file_path):
+            print(f"Error: Index file not found at {self.index_file_path}. Please run 'build' first.")
+            return False
+        
+        try:
+            with open(self.index_file_path, 'r', encoding='utf-8') as f:
+                self.inverted_index = json.load(f)
+
+            print(f"Index successfully loaded from {self.index_file_path}")
+            print(f"Loaded {len(self.inverted_index)} unique words into memory.")
+            return True
+        
+        except json.JSONDecodeError:
+            print(f"Error: {self.index_file_path} is corrupted or not a valid JSON file.")
+            return False
