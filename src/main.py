@@ -65,8 +65,11 @@ def main():
                 if not args:
                     print("Error: Please provide a query to find (e.g., 'find good friends').")
                 else:
-                    # MVP Placeholder: Call your search logic here
-                    print(f"[Stub] Executing 'find': Searching for pages containing '{args}'...")
+                    print(f"Executing 'find': Searching for pages containing '{args}'...")
+                
+                    # Instantiate the Searcher and call the find method.
+                    searcher = Searcher(indexer.inverted_index)
+                    searcher.find_query(args)
                     
             elif command in ["exit", "quit"]:
                 print("Exiting search tool. Goodbye!")
