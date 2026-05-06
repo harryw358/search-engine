@@ -1,4 +1,5 @@
 import sys
+from src.crawler import Crawler
 
 def main():
     print("==================================")
@@ -29,8 +30,13 @@ def main():
 
             # Route to the correct command logic
             if command == "build":
-                # MVP Placeholder: Call your crawler and indexer here later
-                print("[Stub] Executing 'build': Crawling https://quotes.toscrape.com/ and building index...")
+                print("Executing 'build': Crawling https://quotes.toscrape.com/ and building index...")
+
+                # Instantiate and call the crawler logic.
+                crawler = Crawler()
+                crawled_data = crawler.crawl()
+
+                print("[Stub] Building and saving the index to data/.")
                 
             elif command == "load":
                 # MVP Placeholder: Call your file loading logic here later
