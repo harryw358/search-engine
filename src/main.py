@@ -1,5 +1,6 @@
 import sys
 from src.crawler import Crawler
+from src.indexer import Indexer
 
 def main():
     print("==================================")
@@ -36,7 +37,14 @@ def main():
                 crawler = Crawler()
                 crawled_data = crawler.crawl()
 
-                print("[Stub] Building and saving the index to data/.")
+                if crawled_data:
+                    print(f"\nSuccess! Scraped {len(crawled_data)} pages.")
+
+                    # Instantiate the Indexer, build it, and save it.
+                    indexer = Indexer()
+                    indexer.build_index(crawled_data)
+                    indexer.save_index()
+
                 
             elif command == "load":
                 # MVP Placeholder: Call your file loading logic here later
