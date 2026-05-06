@@ -1,6 +1,7 @@
 import json
 import os
 import string
+import re
 
 class Indexer:
     def __init__(self, index_file_path="data/index.json"):
@@ -15,6 +16,7 @@ class Indexer:
         """
         Takes the crawled data, tokenises the text, and builds the inverted index.
         """
+        self.inverted_index = {}
         for page in crawled_data:
             url = page['url']
             text = page['text']
@@ -22,9 +24,8 @@ class Indexer:
             # Convert to lowercase.
             text = text.lower()
 
-            # Remove punctuation.
-            translator = str.maketrans('', '', string.punctuation)
-            clean_text = text.translate(translator)
+            # Replace non-alphanumeric characters with a space.
+            clean_text = re.sub(r"[^\w\s]", "", text.lower())
 
             # Split the text into individual words.
             words = clean_text.split()
@@ -56,4 +57,4 @@ class Indexer:
         with open(self.index_file_path, 'w', encoding='utf-8') as f:
             json.dump(self.inverted_index, f, indent=4)
 
-        print(f"Index saved succesfully to {self.index_file_path}")
+        print(f"Index saved successfully to {self.index_file_path}")
