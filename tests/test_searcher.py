@@ -66,11 +66,24 @@ def test_find_query_single_word(searcher, capsys):
     captured = capsys.readouterr()
     assert "Found 1 page(s)" in captured.out
     assert "http://quotes.toscrape.com/page/1/" in captured.out
+    assert "(Score:" in captured.out # Verify the score is printed
+
+def test_find_query_ranking_order(searcher, capsys):
+    """Tests that TF-IDF correctly ranks pages with higher frequencies first."""
+    # 'world' appears twice on page 1, and once on page 2.
+    # Therefore, page 1 MUST be printed before page 2.
+    searcher.find_query("world")
+    captured = capsys.readouterr()
+    
+    # Get the index of where each URL appears in the standard output
+    pos_page1 = captured.out.find("http://quotes.toscrape.com/page/1/")
+    pos_page2 = captured.out.find("http://quotes.toscrape.com/page/2/")
+    
+    assert pos_page1 != -1 and pos_page2 != -1, "Both pages should be in the output"
+    assert pos_page1 < pos_page2, "Page 1 should be ranked higher than Page 2"
 
 def test_find_query_multi_word_intersection(searcher, capsys):
     """Tests finding pages that contain BOTH words (Boolean AND)."""
-    # 'good' is on pages 1 and 2. 'friends' is on pages 2 and 3. 
-    # The intersection should ONLY be page 2.
     searcher.find_query("good friends")
     captured = capsys.readouterr()
     assert "Found 1 page(s)" in captured.out
@@ -79,7 +92,6 @@ def test_find_query_multi_word_intersection(searcher, capsys):
 
 def test_find_query_multi_word_no_intersection(searcher, capsys):
     """Tests querying two words that exist in the index, but NEVER on the same page."""
-    # 'einstein' is on page 1. 'friends' is on pages 2 and 3.
     searcher.find_query("einstein friends")
     captured = capsys.readouterr()
     assert "No pages found containing all search terms." in captured.out
@@ -88,7 +100,6 @@ def test_find_query_case_and_punctuation(searcher, capsys):
     """Tests query cleaning (lowercasing and punctuation removal)."""
     searcher.find_query("GOOD, friends!")
     captured = capsys.readouterr()
-    # Should resolve exactly the same as "good friends"
     assert "Found 1 page(s)" in captured.out
     assert "http://quotes.toscrape.com/page/2/" in captured.out
 
