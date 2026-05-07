@@ -7,11 +7,20 @@ This project is a command-line search engine tool developed for the COMP3011 Web
 
 The tool processes the extracted text by lowercasing and stripping punctuation using regular expressions, to ensure case-insensitive searching. It allows users to build and save the index to the file system, load it back into memory, view detailed statistics for individual words, and perform boolean AND searches for multi-word queries.
 
+## Features
+* **Recursive Web Crawler:** Uses Breadth-First Search (BFS) to traverse internal links, respecting a 6-second politeness window and gracefully handling network timeouts.
+* **Inverted Index:** Tokenises and cleans text, storing term frequencies and exact positional data in a highly optimized JSON structure.
+* **TF-IDF Searcher:** Ranks search results using Term Frequency-Inverse Document Frequency to ensure highly relevant page matching.
+* **✨ Advanced Query Processing (Exact Phrase Searching):** Supports strict positional filtering using quotation marks (e.g., `"good friends"`) to match exact word sequences.
+* **✨ Query Suggestions (Typo Handling):** Utilises Python's `difflib` to detect misspelled or unindexed words and offers intelligent "Did you mean?" suggestions.
+
 ## Dependencies
 This project requires Python 3.10+ and the following third-party libraries:
 - ```requests```: For making HTTP requests and managing sessions during the crawling phase.
 - ```beautifulsoup4```: For parsing HTML to extract quotes and navigate pagination.
 - ```pytest```: For running the automated testing suite.
+- ```pytest-benchmark```: For running the benchmarking scripts.
+- ```matplotlib```: For visualising the benchmarking results.
 
 ## Installation and Setup
 1. **Clone the repository:**
@@ -68,24 +77,40 @@ finds and returns a list of all pages containing the specified search terms. For
 5. **```quit```** or **```exit```**
 gracefully exists the search engine tool.
 
+### Advanced Search Features
+You can utilise advanced query processing directly in the CLI:
+
+* **Exact Phrase Searching:** Wrap your query in quotation marks to find pages where words appear in exact consecutive order.
+  `> find "albert einstein"`
+* **Typo Auto-Correction:** Type a misspelled word to see the suggestion engine in action.
+  `> find enstein`
+  *(Output: "No results for 'enstein'. Did you mean: 'einstein'?")*
+
 ## Testing Instructions
 This project uses ```pytest``` for comprehensive unit and integration testing, including mocks for network requests to ensure tests run quickly and reliably without hitting the live website.
 To run the entire test suite covering the crawler, indexer, and search modules:
 1. Ensure you are in the root directory of the project (```search-engine/```).
 2. Run the following commmand:
    ```bash
-   pytest tests/ -v
+   python -m pytest tests/ -v
    ```
 
 Should you wish to test each invidual component of the search engine independently, you can also run the following three commands:
 1. ```bash
-   pytest tests/test_crawler.py -v
+   python -m pytest tests/test_crawler.py -v
    ```
 2. ```bash
-   pytest tests/test_indexer.py -v
+   python -m pytest tests/test_indexer.py -v
    ```
 3. ```bash
-   pytest tests/test_searcher.py -v
+   python -m pytest tests/test_searcher.py -v
    ```
 ### Continuous Integration:
 This project is also configured with a GitHub Actions CI pipeline (```.github/workflows/python-tests.yml```). Every time code is pushed to the repository, the test suite is automatically executed in a cloud environment to ensure code stability and prevent regressions.
+
+### Performance Benchmarks
+To ensure the search engine scales efficiently, execution times were profiled using `pytest-benchmark`. The system successfully leverages the O(1) constant lookup time of the Inverted Index dictionary to return complex TD-IDF rankings in milliseconds.
+
+![Performance Benchmarks](benchmark_plot_true.png)
+![Performance Benchmarks (Log Scale)](benchmark_plot_log.png)
+*Note: Evaluated on a locally built index of 213 pages w/ 4678 unique words. Second graph uses a logarithmic scale to properly visualise the computational differences between standard exact-matching and the more intensive difflib suggestion algorithm.*
