@@ -140,3 +140,23 @@ def test_find_query_unfixable_typo(searcher, capsys):
     
     # Assert: It shouldn't find a match and should print the standard fallback
     assert "No pages found containing the term 'zxcvbnm'" in captured.out
+
+def test_find_query_exact_phrase_match(searcher, capsys):
+    """Tests that searching with quotes successfully finds consecutive words."""
+    # Action: Search for a phrase we know exists consecutively (e.g. "good friends")
+    searcher.find_query('"good friends"')
+    captured = capsys.readouterr()
+    
+    # Assert: It should find the phrase and rank the URLs
+    assert "Found" in captured.out
+    assert "Score:" in captured.out
+
+def test_find_query_exact_phrase_miss(searcher, capsys):
+    """Tests that searching with quotes rejects pages where words are out of order."""
+    # Action: Search for words that exist in the index, but NEVER next to each other
+    # Example: 'einstein' and 'world' both exist, but "einstein world" is not a phrase
+    searcher.find_query('"einstein world"')
+    captured = capsys.readouterr()
+    
+    # Assert: The positional filtering should reject it
+    assert "No pages found containing all search terms." in captured.out

@@ -51,11 +51,18 @@ class Searcher:
 
     def find_query(self, query):
         """
-        Finds pages containing all words in the search query. Ranks by TF-IDF score.
+        Finds pages containing all words in the search query.
+        - Ranks pages by TF-IDF score.
+        - Supports EPS (Exact Phrase Searching) if the query is wrapped in quotes.
         """
         if not self.inverted_index:
             print("Error: Index is empty. Please run 'load' or 'build' first.")
             return
+        
+        # Detect exact phrase intent.
+        is_exact_phrase = False
+        if query.strip().startswith('"') and query.strip().endswith('"'):
+            is_exact_phrase = True
         
         # 1. Clean the query.
         clean_query = re.sub(r"[^\w\s]", "", query.lower())
@@ -103,6 +110,34 @@ class Searcher:
 
             word_urls = set(self.inverted_index[word].keys())
             matching_urls = matching_urls.intersection(word_urls)
+
+        # Positional filtering for exact phrases.
+        if is_exact_phrase and matching_urls:
+            exact_match_urls = set()
+            for url in matching_urls:
+                # Start with the known positions of the first word on this specific page.
+                first_word_positions = self.inverted_index[words[0]][url]['positions']
+
+                phrase_found = False
+                for pos in first_word_positions:
+                    valid_sequence = True
+
+                    # Check if subsequent words immediately follow in mathematical order.
+                    for i, phrase_word in enumerate(words[1:], 1):
+                        expected_pos = pos + i
+                        if expected_pos not in self.inverted_index[phrase_word][url]['positions']:
+                            valid_sequence = False
+                            break
+
+                    if valid_sequence:
+                        phrase_found = True
+                        break # We found the phrase at least once on this page.
+
+                if phrase_found:
+                    exact_match_urls.add(url)
+
+            # Overwrite matching_urls with only the pages containing the strict sequence.
+            matching_urls = exact_match_urls
 
         # Apply TF-IDF Ranking to the matched URLs.
         if matching_urls:
