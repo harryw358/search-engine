@@ -3,9 +3,9 @@ name: Search Engine Test Suite
 # This tells GitHub to run the tests every time you push code or create a pull request
 on:
   push:
-    branches: [ "main", "master", "advanced-ranking", "recursive-crawler", "query-suggestions" ]
+    branches: [ "main", "master", "advanced-ranking", "recursive-crawler", "query-suggestions", "advanced-query-processing" ]
   pull_request:
-    branches: [ "main", "master", "advanced-ranking", "recursive-crawler", "query-suggestions" ]
+    branches: [ "main", "master", "advanced-ranking", "recursive-crawler", "query-suggestions", "advanced-query-processing" ]
 
 jobs:
   build-and-test:
