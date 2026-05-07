@@ -38,7 +38,7 @@ def main():
                 print("Executing 'build': Crawling https://quotes.toscrape.com/ and building index...")
 
                 # Instantiate and call the crawler logic.
-                crawler = Crawler()
+                crawler = Crawler(limit_pages=False)
                 crawled_data = crawler.crawl()
 
                 if crawled_data:
