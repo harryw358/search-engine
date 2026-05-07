@@ -1,6 +1,7 @@
 import string
 import re
 import math
+import difflib
 
 class Searcher:
     def __init__(self, inverted_index):
@@ -65,6 +66,22 @@ class Searcher:
             return
         
         print(f"\n--- Search results for '{query}' ---")
+
+        # Query Suggestions: Checks if any words are missing from the index and suggests similar words.
+        missing_words = [word for word in words if word not in self.inverted_index]
+        if missing_words:
+            # Generate a suggestion and abort the search.
+            for missing in missing_words:
+                # Find the closest match in our dictionary of indexed words.
+                matches = difflib.get_close_matches(missing, self.inverted_index.keys(), n=1, cutoff=0.7)
+
+                if matches:
+                    print(f"No results for '{missing}'. Did you mean: '{matches[0]}'?")
+                else:
+                    print(f"No pages found containing the term '{missing}'.")
+            
+            print("-" * (27 + len(query)) + "\n")
+            return
 
         # 2. Boolean AND search logic.
         first_word = words[0]
