@@ -107,7 +107,7 @@ def test_find_query_missing_word(searcher, capsys):
     """Tests a multi-word query where one word does not exist at all."""
     searcher.find_query("einstein bananas")
     captured = capsys.readouterr()
-    assert "No pages found containing all search terms." in captured.out
+    assert "No pages found containing the term 'bananas'." in captured.out
 
 def test_find_query_empty_or_punctuation_only(searcher, capsys):
     """Edge Case: Tests a query that results in no words after stripping punctuation."""
@@ -121,3 +121,22 @@ def test_find_query_empty_index(capsys):
     empty_searcher.find_query("good friends")
     captured = capsys.readouterr()
     assert "Error: Index is empty" in captured.out
+
+def test_find_query_with_typo_suggestion(searcher, capsys):
+    """Tests that a misspelled word triggers a 'Did you mean?' suggestion."""
+    # Action: Search for a typo of 'einstein'
+    searcher.find_query("enstein")
+    captured = capsys.readouterr()
+    
+    # Assert: It should catch the missing word and suggest the closest match
+    assert "No results for 'enstein'" in captured.out
+    assert "Did you mean: 'einstein'?" in captured.out
+
+def test_find_query_unfixable_typo(searcher, capsys):
+    """Tests that completely unknown words fail gracefully without crashing."""
+    # Action: Search for a word that is nowhere near anything in the index
+    searcher.find_query("zxcvbnm")
+    captured = capsys.readouterr()
+    
+    # Assert: It shouldn't find a match and should print the standard fallback
+    assert "No pages found containing the term 'zxcvbnm'" in captured.out
