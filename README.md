@@ -23,6 +23,11 @@ This project requires Python 3.10+ and the following third-party libraries:
 - ```pytest-benchmark```: For running the benchmarking scripts.
 - ```matplotlib```: For visualising the benchmarking results.
 
+## External Libraries Used
+- Double ended queue (```deque```) is inspired by resource available at: https://www.geeksforgeeks.org/python/deque-in-python/
+- Use of regular expressions (```re``` library) to filter Unicode punctuation is inspired by resource available at: https://docs.python.org/3/library/re.html
+- Use of ```difflib``` library for Query Suggestions is inspired by resource available at: https://www.w3schools.com/python/ref_module_difflib.asp
+
 ## Installation and Setup
 1. **Clone the repository:**
 ```bash
