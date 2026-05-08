@@ -1,7 +1,7 @@
 # COMP3011 Search Engine Tool
 
 [![Tests](https://github.com/harryw358/search-engine/actions/workflows/python-tests.yml/badge.svg)](https://github.com/harryw358/search-engine/actions)
-*Note: Please see 'Actions' tab for a detailed output of auotomated testing pipeline.*
+*Note: Please see 'Actions' tab for a detailed output of automated testing pipeline.*
 
 ## Project Overview and Purpose
 This project is a command-line search engine tool developed for the COMP3011 Web Services and Web Data module. It is designed to crawl the target website ([http://quotes.toscrape.com/](http://quotes.toscrape.com/)), to extract quote text and their authors, and construct an inverted index.
